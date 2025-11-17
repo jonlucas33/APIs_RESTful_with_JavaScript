@@ -58,6 +58,7 @@ Abra o navegador em `http://localhost:5173` e você verá o cardápio sendo exib
 | GET | `/api/comandas` | Lista todas as comandas |
 | POST | `/api/comandas` | Cria uma nova comanda |
 | PATCH | `/api/comandas/:id` | Atualiza o status de uma comanda |
+| DELETE | `/api/comandas/:id` | Deleta uma comanda |
 
 ## 🧪 Testando a API
 
@@ -68,7 +69,7 @@ cd backend
 npm test
 ```
 
-**Resultado esperado:** 7 testes passando ✅
+**Resultado esperado:** 13 testes passando ✅
 
 ## 🛠️ Tecnologias
 
@@ -136,10 +137,19 @@ npm test
 - Estilos dinâmicos com cores por status
 - Renderização condicional (pendente → Em Preparo → Concluído)
 
-### 🔴 Passo 4: DELETE (Remover Pedidos) - Próxima Etapa
-- Endpoint DELETE /api/comandas/:id
-- Botão para remover pedido do painel
+### ✅ Passo 4.0: Back-end (TDD - Delete de Comandas) - Completo!
+- Testes escritos primeiro (Fase RED)
+- Endpoint DELETE /api/comandas/:id implementado
+- Função deleteComanda no controlador
+- Todos os testes passando (Fase GREEN)
+- Validação de existência e erro 404
+- 13 testes no total (3 novos para DELETE)
+
+### 🔴 Passo 4.1: Front-end (Botão de Delete) - Próxima Etapa
+- Integrar endpoint DELETE no serviço de API
+- Adicionar botão de deletar no painel
 - Confirmação antes de deletar
+- Atualizar lista após deleção
 
 ## 🔗 Fluxo de Comunicação
 

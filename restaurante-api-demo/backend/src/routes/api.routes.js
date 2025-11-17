@@ -25,5 +25,8 @@ router.post('/comandas', comandasController.createComanda);
 // PATCH /api/comandas/:id - Atualiza o status de uma comanda
 router.patch('/comandas/:id', comandasController.updateComandaStatus);
 
+// DELETE /api/comandas/:id - Deleta uma comanda
+router.delete('/comandas/:id', comandasController.deleteComanda);
+
 // Exporta o router para ser usado no server.js
 module.exports = router;

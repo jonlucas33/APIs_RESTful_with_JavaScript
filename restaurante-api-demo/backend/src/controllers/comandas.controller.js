@@ -106,9 +106,47 @@ const updateComandaStatus = (req, res) => {
   }
 };
 
+// Função para deletar uma comanda (DELETE)
+// Remove um pedido do sistema (ex: cancelamento, limpeza de pedidos antigos)
+const deleteComanda = (req, res) => {
+  try {
+    const { id } = req.params; // Pega o ID da URL
+
+    // Encontra o índice da comanda no array
+    // Usamos == (comparação fraca) para permitir '1' == 1
+    const comandaIndex = comandas.findIndex(c => c.id == id);
+
+    // Se não encontrar (índice -1), retorna 404
+    if (comandaIndex === -1) {
+      return res.status(404).json({
+        sucesso: false,
+        mensagem: 'Comanda não encontrada.'
+      });
+    }
+
+    // Remove a comanda do array usando splice
+    // splice(índice, quantosRemover) - remove 1 elemento no índice encontrado
+    comandas.splice(comandaIndex, 1);
+
+    // Retorna sucesso com status 200 (OK)
+    return res.status(200).json({
+      sucesso: true,
+      mensagem: 'Comanda deletada com sucesso'
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      sucesso: false,
+      mensagem: 'Erro ao deletar comanda',
+      erro: error.message
+    });
+  }
+};
+
 // Exporta as funções para serem usadas nas rotas
 module.exports = {
   getComandas,
   createComanda,
-  updateComandaStatus // <-- Nova função adicionada
+  updateComandaStatus,
+  deleteComanda // <-- Nova função adicionada
 };

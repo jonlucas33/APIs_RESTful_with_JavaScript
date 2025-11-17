@@ -157,3 +157,61 @@ describe('PATCH /api/comandas/:id', () => {
     expect(updateRes.body.status).toBe('Pronto');
   });
 });
+
+// ==================== Testes do DELETE /api/comandas/:id ====================
+describe('DELETE /api/comandas/:id', () => {
+  test('deve deletar uma comanda existente e retornar 200', async () => {
+    // Criar uma comanda para deletar
+    const newComandaRes = await request(app)
+      .post('/api/comandas')
+      .send({ mesa: 'Mesa Delete', itens: [1], total: 25 });
+    
+    const comandaId = newComandaRes.body.dados.id;
+
+    // Deletar a comanda
+    const deleteRes = await request(app)
+      .delete(`/api/comandas/${comandaId}`);
+
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body.sucesso).toBe(true);
+    expect(deleteRes.body.mensagem).toContain('deletada com sucesso');
+
+    // Verificar que a comanda realmente foi removida
+    const getRes = await request(app).get('/api/comandas');
+    const comandaEncontrada = getRes.body.dados.find(c => c.id === comandaId);
+    expect(comandaEncontrada).toBeUndefined();
+  });
+
+  test('deve retornar 404 ao tentar deletar comanda inexistente', async () => {
+    const deleteRes = await request(app)
+      .delete('/api/comandas/999999');
+
+    expect(deleteRes.status).toBe(404);
+    expect(deleteRes.body.sucesso).toBe(false);
+    expect(deleteRes.body.mensagem).toContain('não encontrada');
+  });
+
+  test('deve deletar apenas a comanda especificada', async () => {
+    // Criar duas comandas
+    const comanda1 = await request(app)
+      .post('/api/comandas')
+      .send({ mesa: 'Mesa 1', itens: [1], total: 25 });
+    
+    const comanda2 = await request(app)
+      .post('/api/comandas')
+      .send({ mesa: 'Mesa 2', itens: [2], total: 30 });
+    
+    const id1 = comanda1.body.dados.id;
+    const id2 = comanda2.body.dados.id;
+
+    // Deletar apenas a primeira
+    await request(app).delete(`/api/comandas/${id1}`);
+
+    // Verificar que apenas a primeira foi deletada
+    const getRes = await request(app).get('/api/comandas');
+    const comandas = getRes.body.dados;
+    
+    expect(comandas.find(c => c.id === id1)).toBeUndefined();
+    expect(comandas.find(c => c.id === id2)).toBeDefined();
+  });
+});

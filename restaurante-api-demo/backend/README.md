@@ -71,6 +71,7 @@ O servidor estará rodando em: **http://localhost:4000**
 - **GET** `/api/comandas` - Lista todas as comandas
 - **POST** `/api/comandas` - Cria uma nova comanda
 - **PATCH** `/api/comandas/:id` - Atualiza o status de uma comanda
+- **DELETE** `/api/comandas/:id` - Deleta uma comanda
 
 ---
 
