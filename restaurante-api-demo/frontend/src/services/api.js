@@ -38,3 +38,10 @@ export const updateComandaStatus = (id, novoStatus) => {
   // Faz o PATCH para /api/comandas/:id, enviando o novo status
   return api.patch(`/comandas/${id}`, { status: novoStatus });
 };
+
+// Função para DELETAR uma comanda
+export const deleteComanda = (id) => {
+  console.log(`Front-end: "Garçom, cancelar o pedido #${id}!"`);
+  // Faz o DELETE para /api/comandas/:id
+  return api.delete(`/comandas/${id}`);
+};

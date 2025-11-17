@@ -86,6 +86,15 @@ O front-end se comunica com o back-end através do arquivo `src/services/api.js`
   - Concluído = Verde
 - ✅ Cada pedido pode ter status independente
 
+### Passo 4.1 - Botão de Cancelar (Novo!)
+- ✅ Função deleteComanda integrada com endpoint DELETE
+- ✅ Botão "Cancelar Pedido" (vermelho)
+- ✅ Janela de confirmação antes de deletar (window.confirm)
+- ✅ Atualização instantânea com filter() (sem novo GET)
+- ✅ Proteção: botão não aparece em pedidos "Concluído"
+- ✅ Feedback com alert de sucesso
+- ✅ **CRUD completo no front-end**
+
 ## 🔧 Tecnologias
 
 - **React** - Biblioteca UI

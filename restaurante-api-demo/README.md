@@ -145,11 +145,19 @@ npm test
 - Validação de existência e erro 404
 - 13 testes no total (3 novos para DELETE)
 
-### 🔴 Passo 4.1: Front-end (Botão de Delete) - Próxima Etapa
-- Integrar endpoint DELETE no serviço de API
-- Adicionar botão de deletar no painel
-- Confirmação antes de deletar
-- Atualizar lista após deleção
+### ✅ Passo 4.1: Front-end (Botão de Delete) - Completo!
+- Função deleteComanda no serviço de API
+- Handler handleCancelarPedido com confirmação
+- Botão "Cancelar Pedido" (vermelho) no painel
+- Janela de confirmação (window.confirm)
+- Atualização instantânea com filter()
+- Proteção: botão não aparece em pedidos "Concluído"
+
+### 🎉 Projeto Completo!
+- CRUD full-stack implementado
+- Testes automatizados (13 no back-end)
+- Interface completa e funcional
+- Pronto para demonstração e extensões futuras
 
 ## 🔗 Fluxo de Comunicação
 
