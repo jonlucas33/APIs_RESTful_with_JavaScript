@@ -81,6 +81,8 @@ export function PainelCozinha({ refreshTrigger }) {
     }
   };
 
+  console.log('Renderizando Painel da Cozinha. Pedidos atuais:', comandas);
+
   // --- Renderização ---
   
   if (loading && comandas.length === 0) {
@@ -123,7 +125,7 @@ export function PainelCozinha({ refreshTrigger }) {
                 Status: <span className={`status status-${comanda.status.toLowerCase().replace(' ', '-')}`}>{comanda.status}</span>
               </p>
               <p className="cozinha-itens">
-                📋 Itens: {comanda.itens.length} {comanda.itens.length === 1 ? 'item' : 'itens'}
+                📋 Itens: {comanda.itens.map(item => item).join(', ')} {comanda.itens.length === 1 ? 'item' : 'itens'}
               </p>
               <p className="cozinha-total">
                 <strong>💰 Total: R$ {comanda.total.toFixed(2)}</strong>

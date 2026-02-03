@@ -1,146 +1,156 @@
-// Controlador de Comandas (Pedidos)
-// Este arquivo é como o "Chef de Pedidos" que recebe e gerencia os pedidos dos clientes
+// // Controlador de Comandas (Pedidos)
+// // Este arquivo é como o "Chef de Pedidos" que recebe e gerencia os pedidos dos clientes
 
-const { comandas } = require('../services/database');
+// const { comandas } = require('../services/database');
 
-// Função que retorna todas as comandas (pedidos) registradas
-const getComandas = (req, res) => {
-  try {
-    res.status(200).json({
-      sucesso: true,
-      mensagem: 'Comandas recuperadas com sucesso',
-      quantidade: comandas.length,
-      dados: comandas
-    });
-  } catch (error) {
-    res.status(500).json({
-      sucesso: false,
-      mensagem: 'Erro ao buscar comandas',
-      erro: error.message
-    });
-  }
-};
+// // Função que retorna todas as comandas (pedidos) registradas
+// const getComandas = (req, res) => {
+//   try {
+//     res.status(200).json({
+//       sucesso: true,
+//       mensagem: 'Comandas recuperadas com sucesso',
+//       quantidade: comandas.length,
+//       dados: comandas
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       sucesso: false,
+//       mensagem: 'Erro ao buscar comandas',
+//       erro: error.message
+//     });
+//   }
+// };
 
-// Função que cria uma nova comanda (pedido)
-// Recebe os dados do pedido do cliente via req.body
-const createComanda = (req, res) => {
-  try {
-    // Extrai os dados enviados pelo cliente
-    const { mesa, itens, total } = req.body;
+// // Função que cria uma nova comanda (pedido)
+// // Recebe os dados do pedido do cliente via req.body
+// const createComanda = (req, res) => {
+//   try {
+//     // Extrai os dados enviados pelo cliente
+//     const { mesa, itens, total } = req.body;
 
-    // total = total * 1.10;
+//     // total = total * 1.10;
 
-    // Cria um novo objeto de comanda
-    const novaComanda = {
-      id: comandas.length + 1, // ID automático baseado no tamanho do array
-      mesa,
-      itens,
-      total,
-      status: 'concluido',
-      dataPedido: new Date().toISOString()
-    };
+//     // Cria um novo objeto de comanda
+//     const novaComanda = {
+//       id: comandas.length + 1, // ID automático baseado no tamanho do array
+//       mesa,
+//       itens,
+//       total,
+//       status: 'concluido',
+//       dataPedido: new Date().toISOString()
+//     };
 
-    // Adiciona a nova comanda ao array
-    comandas.push(novaComanda);
+//     // Adiciona a nova comanda ao array
+//     comandas.push(novaComanda);
 
-    // Retorna a comanda criada com status 201 (Created)
-    res.status(201).json({
-      sucesso: true,
-      mensagem: 'Comanda criada com sucesso',
-      dados: novaComanda
-    });
-  } catch (error) {
-    res.status(500).json({
-      sucesso: false,
-      mensagem: 'Erro ao criar comanda',
-      erro: error.message
-    });
-  }
-};
+//     // Retorna a comanda criada com status 201 (Created)
+//     res.status(201).json({
+//       sucesso: true,
+//       mensagem: 'Comanda criada com sucesso',
+//       dados: novaComanda
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       sucesso: false,
+//       mensagem: 'Erro ao criar comanda',
+//       erro: error.message
+//     });
+//   }
+// };
 
-// Função para atualizar o status de uma comanda (PATCH)
-// Permite mudar o status de um pedido (ex: pendente → Em Preparo → Pronto)
-const updateComandaStatus = (req, res) => {
-  try {
-    const { id } = req.params; // Pega o ID da URL
-    const { status } = req.body; // Pega o novo status do corpo da requisição
+// // Função para atualizar o status de uma comanda (PATCH)
+// // Permite mudar o status de um pedido (ex: pendente → Em Preparo → Pronto)
+// const updateComandaStatus = (req, res) => {
+//   try {
+//     const { id } = req.params; // Pega o ID da URL
+//     const { status } = req.body; // Pega o novo status do corpo da requisição
 
-    // Validação: verifica se o status foi enviado
-    if (!status) {
-      return res.status(400).json({
-        sucesso: false,
-        mensagem: 'Status é obrigatório para atualizar a comanda'
-      });
-    }
+//     // Validação: verifica se o status foi enviado
+//     if (!status) {
+//       return res.status(400).json({
+//         sucesso: false,
+//         mensagem: 'Status é obrigatório para atualizar a comanda'
+//       });
+//     }
 
-    // Encontra o índice da comanda no array
-    // Usamos == (comparação fraca) para permitir '1' == 1
-    const comandaIndex = comandas.findIndex(c => c.id == id);
+//     // Encontra o índice da comanda no array
+//     // Usamos == (comparação fraca) para permitir '1' == 1
+//     const comandaIndex = comandas.findIndex(c => c.id == id);
 
-    // Se não encontrar (índice -1), retorna 404
-    if (comandaIndex === -1) {
-      return res.status(404).json({
-        sucesso: false,
-        mensagem: 'Comanda não encontrada.'
-      });
-    }
+//     // Se não encontrar (índice -1), retorna 404
+//     if (comandaIndex === -1) {
+//       return res.status(404).json({
+//         sucesso: false,
+//         mensagem: 'Comanda não encontrada.'
+//       });
+//     }
 
-    // Atualiza o status da comanda encontrada
-    comandas[comandaIndex].status = status;
+//     // Atualiza o status da comanda encontrada
+//     comandas[comandaIndex].status = status;
 
-    // Retorna a comanda inteira atualizada com status 200 (OK)
-    return res.status(200).json(comandas[comandaIndex]);
+//     // Retorna a comanda inteira atualizada com status 200 (OK)
+//     return res.status(200).json(comandas[comandaIndex]);
 
-  } catch (error) {
-    return res.status(500).json({
-      sucesso: false,
-      mensagem: 'Erro ao atualizar comanda',
-      erro: error.message
-    });
-  }
-};
+//   } catch (error) {
+//     return res.status(500).json({
+//       sucesso: false,
+//       mensagem: 'Erro ao atualizar comanda',
+//       erro: error.message
+//     });
+//   }
+// };
 
-// Função para deletar uma comanda (DELETE)
-// Remove um pedido do sistema (ex: cancelamento, limpeza de pedidos antigos)
-const deleteComanda = (req, res) => {
-  try {
-    const { id } = req.params; // Pega o ID da URL
+// // Função para deletar uma comanda (DELETE)
+// // Remove um pedido do sistema (ex: cancelamento, limpeza de pedidos antigos)
+// const deleteComanda = (req, res) => {
+//   try {
+//     const { id } = req.params; // Pega o ID da URL
 
-    // Encontra o índice da comanda no array
-    // Usamos == (comparação fraca) para permitir '1' == 1
-    const comandaIndex = comandas.findIndex(c => c.id == id);
+//     // Encontra o índice da comanda no array
+//     // Usamos == (comparação fraca) para permitir '1' == 1
+//     const comandaIndex = comandas.findIndex(c => c.id == id);
 
-    // Se não encontrar (índice -1), retorna 404
-    if (comandaIndex === -1) {
-      return res.status(404).json({
-        sucesso: false,
-        mensagem: 'Comanda não encontrada.'
-      });
-    }
+//     // Se não encontrar (índice -1), retorna 404
+//     if (comandaIndex === -1) {
+//       return res.status(404).json({
+//         sucesso: false,
+//         mensagem: 'Comanda não encontrada.'
+//       });
+//     }
 
-    // Remove a comanda do array usando splice
-    // splice(índice, quantosRemover) - remove 1 elemento no índice encontrado
-    comandas.splice(comandaIndex, 1);
+//     // Remove a comanda do array usando splice
+//     // splice(índice, quantosRemover) - remove 1 elemento no índice encontrado
+//     comandas.splice(comandaIndex, 1);
 
-    // Retorna sucesso com status 200 (OK)
-    return res.status(200).json({
-      sucesso: true,
-      mensagem: 'Comanda deletada com sucesso'
-    });
+//     //Reordenar array para manter os IDs sequenciais
+//     //Sem substituir id faltante e sim ocupar o último id disponível
+//     //Pedido 1, Pedido 2, Pedido 3 → Deleta Pedido 2 → Pedido 1, Pedido 3
+//     //Adiconar pedido → Pedido 1, Pedido 3, Pedido 4
+//     //Está ocupando o último id que foi cancelado e isso está errado
+//     comandas.forEach((comanda, index) => {
+//       console.log('Reordenando comanda:', comanda.id, 'para', index + 3);
+//       comanda.id = index + 1;
+//     });
 
-  } catch (error) {
-    return res.status(500).json({
-      sucesso: false,
-      mensagem: 'Erro ao deletar comanda',
-      erro: error.message
-    });
-  }
-};
+//     // Retorna sucesso com status 200 (OK)
+//     return res.status(200).json({
+//       sucesso: true,
+//       mensagem: 'Comanda deletada com sucesso'
+//     });
 
-// Exporta as funções para serem usadas nas rotas
-module.exports = {
-  getComandas,
-  createComanda,
-  updateComandaStatus,
-  deleteComanda 
-};
+//   } catch (error) {
+//     return res.status(500).json({
+//       sucesso: false,
+//       mensagem: 'Erro ao deletar comanda',
+//       erro: error.message
+//     });
+//   }
+// };
+
+// // Exporta as funções para serem usadas nas rotas
+// module.exports = {
+//   getComandas,
+//   createComanda,
+//   updateComandaStatus,
+//   deleteComanda 
+// };

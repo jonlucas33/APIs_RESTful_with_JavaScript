@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCardapio, createComanda } from './services/api'; // Importa nossas funções da API
+import { listarCardapio } from './services/api'; // Importa nossas funções da API
 import { PainelCozinha } from './components/PainelCozinha'; // Importa o Painel da Cozinha
 import './App.css'; // Vite inclui este CSS básico
 
@@ -11,9 +11,10 @@ function App() {
   // Estado para erros
   const [error, setError] = useState(null);
   // Estado para a comanda (carrinho de pedidos)
-  const [comanda, setComanda] = useState([
-    { nome: "Energético", preco: 0 }
-  ]);
+  const [comanda, setComanda] = useState([]);
+
+  const [numeroMesa, setNumeroMesa] = useState(1);
+
   // Estado para controlar atualização do Painel da Cozinha (gatilho)
   const [refreshPedidos, setRefreshPedidos] = useState(0);
 
@@ -22,7 +23,7 @@ function App() {
     // Função interna para "chamar o garçom"
     const fetchCardapio = async () => {
       try {
-        const response = await getCardapio();
+        const response = await listarCardapio();
         console.log('✅ Front-end: "Cardápio recebido!"', response.data);
         
         // A resposta da API vem em response.data.dados (conforme nosso back-end)
@@ -53,7 +54,7 @@ function App() {
 
   // Função para calcular o total da comanda
   const calcularTotalComanda = () => {
-    return comanda.reduce((total, item) => total + item.preco + (total*0.10), 0);
+    return comanda.reduce((total, item) => total + item.preco, 0);
   };
 
   // Função para ENVIAR o pedido para o back-end
@@ -64,7 +65,7 @@ function App() {
     // }
 
     const dadosDoPedido = {
-      mesa: 'Mesa 5', // Podemos deixar fixo por enquanto
+      mesa: `Mesa ${numeroMesa}`, // Usa o estado numeroMesa
       itens: comanda.map(item => item.id), // Envia só os IDs, como no back-end
       total: calcularTotalComanda(),
     };
@@ -74,7 +75,8 @@ function App() {
       console.log('✅ Pedido enviado com sucesso!', response.data);
       alert(`✅ Pedido #${response.data.dados.id} está chegando na casa de João!`);
       setComanda([]); // Limpa o carrinho
-      
+
+      setNumeroMesa(numeroMesaSoma => numeroMesaSoma + 1); 
       // ATUALIZA A LISTA DE PEDIDOS NO PAINEL DA COZINHA
       setRefreshPedidos(count => count + 1); // Incrementa o gatilho
       
@@ -118,10 +120,10 @@ function App() {
           <div key={item.id} className="cardapio-item">
             <h2>{item.nome}</h2>
             <p className="descricao">{item.descricao}</p>
-            <p className="preco">R$ {item.preco.toFixed(2)}</p>
+            <p className="preco">R$ {item.preco}</p>
             {/* Botão para adicionar item à comanda */}
             <button 
-            // onClick={() => handleAddItemComanda(item)} 
+            onClick={() => handleAddItemComanda(item)} 
             style={{color: 'red'}}>
               ➕ Adicionar ao Pedido
             </button>
