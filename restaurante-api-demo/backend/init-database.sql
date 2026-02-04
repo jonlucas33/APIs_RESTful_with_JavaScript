@@ -1,46 +1,101 @@
--- Script de Inicialização do Banco de Dados do Restaurante
--- Execute este script para criar o banco de dados e as tabelas necessárias
-
--- Criar o banco de dados (se não existir)
--- NOTA: Execute esta linha conectado ao banco 'postgres' padrão
--- CREATE DATABASE restaurante_db;
-
--- Conectar ao banco de dados restaurante_db antes de executar o restante
--- \c restaurante_db
+-- ==========================================================
+-- 📋 DDL - LINGUAGEM DE DEFINIÇÃO DE DADOS
+-- ==========================================================
+-- 
+-- PROPÓSITO: Este arquivo contém APENAS a ESTRUTURA do banco.
+-- Não há INSERTs aqui porque seguimos boas práticas de separação:
+--
+-- ✅ DDL (Data Definition Language) = ESTRUTURA
+--    - CREATE TABLE, ALTER TABLE, DROP TABLE
+--    - CREATE INDEX, PRIMARY KEY, FOREIGN KEY
+--    - Define "como os dados serão armazenados"
+--
+-- ✅ SEED (Alimentação) = DADOS INICIAIS
+--    - INSERT, executados via script separado (seed.js)
+--    - Permite versionar dados de forma independente
+--    - Facilita limpar/repopular dados sem recriar estrutura
+--
+-- ==========================================================
+-- 🎓 POR QUE SEPARAR DDL DE SEED?
+-- ==========================================================
+-- 
+-- 1. CONTROLE DE VERSÃO:
+--    - Estrutura muda raramente (ex: adicionar coluna)
+--    - Dados mudam frequentemente (ex: novos itens do cardápio)
+--    - Separar permite rastrear mudanças de forma independente
+--
+-- 2. AMBIENTES DIFERENTES:
+--    - DEV: Precisa de muitos dados de teste (seed completo)
+--    - STAGING: Cópia dos dados de produção
+--    - PRODUÇÃO: Sem seed (dados reais vêm de operações)
+--
+-- 3. TESTES AUTOMATIZADOS:
+--    - Estrutura é criada 1x (migrations)
+--    - Dados são limpos/recriados a cada teste (seed)
+--    - TRUNCATE + SEED é mais rápido que DROP + CREATE
+--
+-- 4. SEGURANÇA:
+--    - Em produção: DBA executa DDL (permissões elevadas)
+--    - Em produção: Aplicação executa DML (permissões limitadas)
+--
+-- ==========================================================
 
 -- Criar a tabela de cardápio
 CREATE TABLE IF NOT EXISTS cardapio (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
-  preco DECIMAL(10, 2) NOT NULL,
-  descricao TEXT
+  preco DECIMAL(10, 2) NOT NULL CHECK (preco > 0),
+  descricao TEXT,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Criar a tabela de comandas (pedidos)
 CREATE TABLE IF NOT EXISTS comandas (
   id SERIAL PRIMARY KEY,
-  mesa INTEGER NOT NULL,
-  status VARCHAR(50) DEFAULT 'pendente',
+  mesa INTEGER NOT NULL CHECK (mesa > 0),
+  status VARCHAR(50) DEFAULT 'pendente' CHECK (status IN ('pendente', 'em_preparo', 'pronto', 'entregue', 'cancelado')),
   itens JSONB NOT NULL,
-  total DECIMAL(10, 2) NOT NULL,
+  total DECIMAL(10, 2) NOT NULL CHECK (total >= 0),
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Inserir dados iniciais no cardápio
-INSERT INTO cardapio (nome, preco, descricao) VALUES
-  ('Prato Feito', 13.00, 'Arroz, feijão, bife e salada'),
-  ('Suco de Laranja', 8.00, 'Suco natural 500ml'),
-  ('Hambúrguer Artesanal', 35.00, 'Pão, carne 180g, queijo e batata'),
-  ('Pizza Margherita', 40.00, 'Pizza tradicional italiana'),
-  ('Refrigerante', 7.00, 'Lata 350ml'),
-  ('Doce', 7.00, 'Sobremesa do dia')
-ON CONFLICT DO NOTHING;
+-- ==========================================================
+-- 📊 ÍNDICES PARA PERFORMANCE
+-- ==========================================================
+-- Índices melhoram a velocidade de consultas (SELECT) mas
+-- tornam INSERT/UPDATE um pouco mais lentos.
+-- Criamos índices em colunas que são frequentemente usadas em:
+-- - WHERE (filtros)
+-- - JOIN (junções)
+-- - ORDER BY (ordenação)
+-- ==========================================================
 
--- Criar índices para melhor performance
+-- Índice para buscar comandas por status (ex: WHERE status = 'pendente')
 CREATE INDEX IF NOT EXISTS idx_comandas_status ON comandas(status);
+
+-- Índice para buscar comandas por mesa (ex: WHERE mesa = 5)
 CREATE INDEX IF NOT EXISTS idx_comandas_mesa ON comandas(mesa);
 
--- Verificar se tudo foi criado corretamente
-SELECT 'Tabelas criadas com sucesso!' AS status;
-SELECT COUNT(*) AS total_itens_cardapio FROM cardapio;
+-- Índice composto para buscar por mesa E status juntos
+-- Útil para queries como: SELECT * FROM comandas WHERE mesa = 5 AND status = 'pendente'
+CREATE INDEX IF NOT EXISTS idx_comandas_mesa_status ON comandas(mesa, status);
+
+-- ==========================================================
+-- ✅ VERIFICAÇÃO
+-- ==========================================================
+-- Comentários SQL que ajudam a validar a criação das tabelas
+-- ==========================================================
+
+-- Listar todas as tabelas criadas
+-- SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+
+-- Verificar estrutura da tabela cardapio
+-- \d cardapio
+
+-- Verificar estrutura da tabela comandas
+-- \d comandas
+
+-- Verificar índices criados
+-- SELECT indexname, tablename FROM pg_indexes WHERE schemaname = 'public';

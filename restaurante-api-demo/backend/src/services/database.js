@@ -24,7 +24,6 @@ module.exports = {
   query: (text, params) => pool.query(text, params),
 };
 
-
 // // Simulação de Banco de Dados em Memória
 // // Este arquivo funciona como nossa "cozinha" onde guardamos os dados
 
