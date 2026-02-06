@@ -2,12 +2,14 @@ const db = require('../services/database');
 
 const listarCardapio = async (req, res) => {
   try {
-    const resultado = await db.query('SELECT * FROM cardapio');
+    const [rows] = await db.query('SELECT * FROM cardapio'); 
+
     res.json({
       sucesso: true,
-      dados: resultado.rows
+      dados: rows
     });
   } catch (erro) {
+    console.error(erro); // Log para ajudar no debug do Render
     res.status(500).json({ sucesso: false, mensagem: "Erro ao acessar o banco" });
   }
 };
