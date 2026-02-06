@@ -3,7 +3,7 @@ import axios from 'axios';
 // Cria uma "instância" do axios com a URL base do nosso back-end
 // Isso facilita pois não precisamos repetir a URL completa em cada requisição
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api', // A porta do nosso back-end
+  baseURL: 'https://apis-restful-with-javascript.onrender.com/api', // A porta do nosso back-end
 });
 
 // Função para buscar o cardápio completo
