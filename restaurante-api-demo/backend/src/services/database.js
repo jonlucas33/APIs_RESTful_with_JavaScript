@@ -1,28 +1,49 @@
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-// Configuração do Pool de conexões usando as variáveis do seu .env
-const pool = new Pool({
-  user: process.env.DB_USER,
+// Configuração para TiDB / MySQL
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT || 4000,
+  ssl: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true // TiDB exige conexão segura
+  },
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-// Teste de conexão inicial (Importante para Validação de Implantação)
-pool.on('connect', () => {
-  console.log('📦 Conectado ao PostgreSQL com sucesso!');
-});
+module.exports = pool;
 
-pool.on('error', (err) => {
-  console.error('❌ Erro inesperado no cliente PostgreSQL', err);
-});
+// const { Pool } = require('pg');
+// require('dotenv').config();
 
-module.exports = {
-  // Exportamos o método query para ser usado nos controllers
-  query: (text, params) => pool.query(text, params),
-};
+// // Configuração do Pool de conexões usando as variáveis do seu .env
+// const pool = new Pool({
+//   user: process.env.DB_USER,
+//   host: process.env.DB_HOST,
+//   database: process.env.DB_DATABASE,
+//   password: process.env.DB_PASSWORD,
+//   port: process.env.DB_PORT,
+// });
+
+// // Teste de conexão inicial (Importante para Validação de Implantação)
+// pool.on('connect', () => {
+//   console.log('📦 Conectado ao PostgreSQL com sucesso!');
+// });
+
+// pool.on('error', (err) => {
+//   console.error('❌ Erro inesperado no cliente PostgreSQL', err);
+// });
+
+// module.exports = {
+//   // Exportamos o método query para ser usado nos controllers
+//   query: (text, params) => pool.query(text, params),
+// };
 
 // // Simulação de Banco de Dados em Memória
 // // Este arquivo funciona como nossa "cozinha" onde guardamos os dados

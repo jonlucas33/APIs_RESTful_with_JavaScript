@@ -5,7 +5,7 @@
 const app = require('./app');
 
 // Define a porta do servidor
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 // ========== INICIA O SERVIDOR ==========
 app.listen(PORT, () => {
