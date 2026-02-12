@@ -54,7 +54,7 @@ function App() {
 
   // Função para calcular o total da comanda
   const calcularTotalComanda = () => {
-    return comanda.reduce((total, item) => total + item.preco, 0);
+    return comanda.reduce((total, item) => total + (parseFloat(item.preco) || 0), 0);
   };
 
   // Função para ENVIAR o pedido para o back-end
