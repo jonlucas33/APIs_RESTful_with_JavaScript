@@ -5,14 +5,14 @@
 
 const request = require('supertest');
 const app = require('../app'); // Importa sua aplicação Express
-const { resetComandas } = require('../src/services/database'); // Importa função para limpar dados
+//const { resetComandas } = require('../src/services/database'); // Importa função para limpar dados
 
 // HOOK GLOBAL
 // beforeAll pode ser usado para subir banco, etc.
 // beforeEach roda ANTES de cada 'it' ou 'test'.
-beforeEach(() => {
-  resetComandas(); // Zera o "banco de dados" na memória para evitar sujeira de um teste afetar outro
-});
+// beforeEach(() => {
+//   resetComandas(); // Zera o "banco de dados" na memória para evitar sujeira de um teste afetar outro
+// });
 
 // ==================================================================
 // GRUPO 1: CARDÁPIO (Apenas Leitura)
@@ -45,13 +45,16 @@ describe('🥕 Rotas de Cardápio', () => {
     const response = await request(app).get('/api/cardapio/1');
     
     expect(response.status).toBe(200);
-    expect(response.body.nome).toBe('Prato Feito'); // Validando dado exato
+    expect(response.body.dados).toHaveProperty('nome', 'Prato Feito');
+    expect(response.body.dados).toHaveProperty('preco'); // MySQL DECIMAL retorna como string
+    expect(parseFloat(response.body.dados.preco)).toBe(13.00); // Valida o valor numérico
   });
 
   // Teste de Erro (Caminho Triste)
   it('GET /api/cardapio/:id - Deve retornar 404 se o prato não existir', async () => {
     const response = await request(app).get('/api/cardapio/9999');
     expect(response.status).toBe(404);
+    expect(response.body.sucesso).toBe(false);
   });
 });
 
@@ -70,8 +73,8 @@ describe('📝 Rotas de Comandas', () => {
   // --- CRIAÇÃO ---
   it('POST /api/comandas - Deve criar uma comanda com sucesso (201)', async () => {
     const novoPedido = {
-      mesa: 'Mesa 5',
-      itens: [1, 2], // Prato Feito + Suco
+      mesa: 5, // Banco espera INTEGER
+      itens: [1, 2], // Array de IDs (simplificado para teste)
       total: 33.00
     };
 
@@ -82,6 +85,7 @@ describe('📝 Rotas de Comandas', () => {
     expect(response.status).toBe(201); // Created
     expect(response.body.dados).toHaveProperty('id'); // O ID deve ser gerado automaticamente
     expect(response.body.dados.status).toBe('pendente'); // Status padrão
+    expect(response.body.dados.mesa).toBe(5);
   });
 
   it('POST /api/comandas - Deve recusar pedido sem mesa (Validação)', async () => {
@@ -103,39 +107,45 @@ describe('📝 Rotas de Comandas', () => {
   it('PATCH /api/comandas/:id - Deve atualizar o status do pedido', async () => {
     // 1. Setup: Criar uma comanda primeiro
     const criacao = await request(app).post('/api/comandas').send({
-      mesa: 'Mesa 10', itens: [1], total: 25
+      mesa: 10, // INTEGER
+      itens: [1], 
+      total: 25
     });
     const idComanda = criacao.body.dados.id;
 
-    // 2. Ação: Mudar status
+    // 2. Ação: Mudar status (lowercase com underscore conforme banco)
     const atualizacao = await request(app)
       .patch(`/api/comandas/${idComanda}`)
-      .send({ status: 'Em Preparo' });
+      .send({ status: 'em_preparo' });
 
     // 3. Asserção
     expect(atualizacao.status).toBe(200);
-    expect(atualizacao.body.status).toBe('Em Preparo');
+    expect(atualizacao.body.dados.status).toBe('em_preparo'); // Estrutura: { dados: { status: ... } }
   });
 
   it('PATCH /api/comandas/:id - Deve retornar 404 ao tentar atualizar ID inexistente', async () => {
     const response = await request(app)
-      .patch('/api/comandas/999')
-      .send({ status: 'Pronto' });
+      .patch('/api/comandas/999999') // ID que não existe
+      .send({ status: 'pronto' }); // lowercase
     
     expect(response.status).toBe(404);
+    expect(response.body.sucesso).toBe(false);
   });
 
   // --- DELEÇÃO ---
   it('DELETE /api/comandas/:id - Deve apagar uma comanda', async () => {
     // 1. Setup
     const criacao = await request(app).post('/api/comandas').send({
-      mesa: 'Mesa Tchau', itens: [1], total: 25
+      mesa: 99, // INTEGER
+      itens: [1], 
+      total: 25
     });
     const id = criacao.body.dados.id;
 
     // 2. Ação
     const delecao = await request(app).delete(`/api/comandas/${id}`);
     expect(delecao.status).toBe(200);
+    expect(delecao.body.sucesso).toBe(true);
 
     // 3. Verificação Dupla (Garantir que sumiu mesmo)
     const busca = await request(app).get('/api/comandas');
@@ -152,13 +162,14 @@ describe('📝 Rotas de Comandas', () => {
 describe('🚀 Regras de Negócio (TDD - Cenários Futuros)', () => {
   it('POST /api/comandas - Não deve permitir comandas sem itens', async () => {
     const pedidoSemItens = {
-      mesa: 'Mesa Vazia',
-      itens: [],
+      mesa: 1, // INTEGER
+      itens: [], // Array vazio
       total: 0
     };
 
     const response = await request(app).post('/api/comandas').send(pedidoSemItens);
     expect(response.status).toBe(400);
+    expect(response.body.sucesso).toBe(false);
   });
 });
 
