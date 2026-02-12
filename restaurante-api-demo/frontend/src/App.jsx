@@ -144,14 +144,14 @@ function App() {
             comanda.map((item, index) => (
               <div key={index} className="comanda-item">
                 <span className="comanda-item-nome">{item.nome}</span>
-                <span className="comanda-item-preco">R$ {item.preco.toFixed(2)}</span>
+                <span className="comanda-item-preco">R$ {(Number.isFinite(Number(item.preco)) ? Number(item.preco) : 0).toFixed(2)}</span>
               </div>
             ))
           )}
         </div>
         <hr />
         <div className="comanda-total">
-          <strong>Total: R$ {calcularTotalComanda().toFixed(2)}</strong>
+          <strong>Total: R$ {(Number.isFinite(Number(calcularTotalComanda())) ? Number(calcularTotalComanda()) : 0).toFixed(2)}</strong>
         </div>
         <button
           className="btn-fazer-pedido"

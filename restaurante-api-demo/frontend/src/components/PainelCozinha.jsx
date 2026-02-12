@@ -128,7 +128,7 @@ export function PainelCozinha({ refreshTrigger }) {
                 📋 Itens: {comanda.itens.map(item => item).join(', ')} {comanda.itens.length === 1 ? 'item' : 'itens'}
               </p>
               <p className="cozinha-total">
-                <strong>💰 Total: R$ {comanda.total.toFixed(2)}</strong>
+                <strong>💰 Total: R$ {(Number.isFinite(Number(comanda.total)) ? Number(comanda.total) : 0).toFixed(2)}</strong>
               </p>
               <p className="cozinha-data">
                 <small>🕐 Recebido: {new Date(comanda.dataPedido).toLocaleString('pt-BR')}</small>
