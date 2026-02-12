@@ -23,7 +23,7 @@ export const getCardapioItem = (id) => {
 
 // Função para criar uma nova comanda (pedido)
 // (Será usada em uma etapa futura)
-export const createComanda = (comanda) => {
+export const criarComanda = (comanda) => {
   console.log('📝 Front-end: "Garçom, aqui está nosso pedido!"', comanda);
   return api.post('/comandas', comanda);
 };
