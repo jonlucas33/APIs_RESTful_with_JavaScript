@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listarCardapio } from './services/api'; // Importa nossas funções da API
+import { listarCardapio, criarComanda } from './services/api'; // Importa nossas funções da API
 import { PainelCozinha } from './components/PainelCozinha'; // Importa o Painel da Cozinha
 import './App.css'; // Vite inclui este CSS básico
 
@@ -59,19 +59,22 @@ function App() {
 
   // Função para ENVIAR o pedido para o back-end
   const handleFazerPedido = async () => {
-    // if (comanda.length === 0) {
-    //   alert('Sua comanda está vazia!');
-    //   return;
-    // }
+     if (comanda.length === 0) {
+       alert('Sua comanda está vazia!');
+       return;
+     }
 
     const dadosDoPedido = {
-      mesa: `Mesa ${numeroMesa}`, // Usa o estado numeroMesa
+      mesa: numeroMesa, // Usa o estado numeroMesa
       itens: comanda.map(item => item.id), // Envia só os IDs, como no back-end
       total: calcularTotalComanda(),
     };
 
     try {
-      const response = await createComanda(dadosDoPedido);
+
+      console.log('📝 Front-end: "Enviando pedido para a cozinha..."', dadosDoPedido);
+
+      const response = await criarComanda(dadosDoPedido);
       console.log('✅ Pedido enviado com sucesso!', response.data);
       alert(`✅ Pedido #${response.data.dados.id} está chegando na casa de João!`);
       setComanda([]); // Limpa o carrinho
@@ -156,7 +159,7 @@ function App() {
         <button
           className="btn-fazer-pedido"
           onClick={handleFazerPedido}
-          // disabled={comanda.length === 0}
+          disabled={comanda.length === 0}
         >
           🍽️ Fazer Pedido
         </button>

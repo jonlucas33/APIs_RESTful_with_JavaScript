@@ -2,8 +2,10 @@ import axios from 'axios';
 
 // Cria uma "instância" do axios com a URL base do nosso back-end
 // Isso facilita pois não precisamos repetir a URL completa em cada requisição
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'; // Usa a variável de ambiente ou o localhost
+
 const api = axios.create({
-  baseURL: 'https://apis-restful-with-javascript.onrender.com/api', // A porta do nosso back-end
+  baseURL: baseURL, // A porta do nosso back-end
 });
 
 // Função para buscar o cardápio completo
@@ -21,7 +23,7 @@ export const getCardapioItem = (id) => {
 
 // Função para criar uma nova comanda (pedido)
 // (Será usada em uma etapa futura)
-export const createComanda = (comanda) => {
+export const criarComanda = (comanda) => {
   console.log('📝 Front-end: "Garçom, aqui está nosso pedido!"', comanda);
   return api.post('/comandas', comanda);
 };

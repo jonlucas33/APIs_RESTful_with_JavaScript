@@ -110,12 +110,12 @@ const criarComanda = async (req, res) => {
       });
     }
 
-    if (isNaN(mesa) || mesa <= 0) {
-      return res.status(400).json({
-        sucesso: false,
-        mensagem: 'Mesa deve ser um número positivo'
-      });
-    }
+    // if (isNaN(mesa) || mesa <= 0) {
+    //   return res.status(400).json({
+    //     sucesso: false,
+    //     mensagem: 'Mesa deve ser um número positivo'
+    //   });
+    // }
 
     if (isNaN(total) || total < 0) {
       return res.status(400).json({
@@ -124,21 +124,28 @@ const criarComanda = async (req, res) => {
       });
     }
 
+    console.log("Passou dos checks de validação. Criando comanda:", mesa,"itens:", itens, "total:", total);
+
     // Converte itens para JSON string (MySQL aceita string JSON)
     const itensJSON = JSON.stringify(itens);
     const status = 'pendente'; // Status padrão
 
+    console.log('Mesa recebida:', mesa);
     // Insert da comanda
     const [result] = await db.query(
       'INSERT INTO comandas (mesa, status, itens, total) VALUES (?, ?, ?, ?)',
       [mesa, status, itensJSON, total]
     );
 
+    console.log('Comanda inserida no banco com ID:', result.insertId);
+
     // Busca a comanda recém-criada
     const [novaComanda] = await db.query(
       'SELECT * FROM comandas WHERE id = ?',
       [result.insertId]
     );
+
+    console.log('Comanda recém-criada (raw do banco):', novaComanda[0]);
 
     console.log('DEBUG - Tipo de itens após buscar:', typeof novaComanda[0].itens);
     console.log('DEBUG - Valor de itens:', novaComanda[0].itens);
